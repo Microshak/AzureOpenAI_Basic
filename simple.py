@@ -1,9 +1,11 @@
 import os
+import weave
 from openai import AzureOpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
 
+weave.init("microshak/azureopenai_basic")
 
 client = AzureOpenAI(
   azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT"), 
@@ -11,11 +13,14 @@ client = AzureOpenAI(
   api_version="2024-02-01"
 )
 
-response = client.chat.completions.create(
-    model="bhgfinancial_ai", # model = "deployment_name".
-    messages=[
-        {"role": "user", "content": "What is the capital of Utah"}
-    ]
-)
+@weave.op()
+def get_response():
+    response = client.chat.completions.create(
+        model="bhgfinancial_ai", # model = "deployment_name".
+        messages=[
+            {"role": "user", "content": "What is the capital of Utah"}
+        ]
+    )
+    return response
 
-print(response.choices[0].message.content)
+print(get_response().choices[0].message.content)
